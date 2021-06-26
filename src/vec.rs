@@ -20,8 +20,16 @@ impl Vec3{
             z: value,
         }
     }
+    pub fn len(self) -> f64 {
+        self.len_sqrt().sqrt()
+    }
+    pub fn len_sqrt(self) -> f64 {
+        self.x * self.x + 
+        self.y * self.y + 
+        self.z * self.z
+    }
 }
-
+// a + b
 impl Add for Vec3 {
     type Output = Self;
 
@@ -61,5 +69,34 @@ impl SubAssign for Vec3 {
             y: self.y - other.y,
             z: self.z - other.z,
         };
+    }
+}
+impl Neg for Vec3{
+    type Output = Self;
+    fn neg(self) -> Self {
+        Vec3 {
+            x:  -self.x,
+            y:  -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, value: f64){
+        *self = Self {
+            x: self.x * value,
+            y: self.y * value,
+            z: self.z * value,
+        }
+    }
+}
+impl DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, value: f64){
+        *self = Self {
+            x: self.x / value,
+            y: self.y / value,
+            z: self.z / value,
+        }
     }
 }
