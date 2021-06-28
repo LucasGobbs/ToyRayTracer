@@ -31,7 +31,7 @@ fn main() {
         vertical / 2.0 - 
         Vec3::new(0.0,0.0,focal_length);
 
-    let mut world: HittablePool<Sphere> = HittablePool::new();
+    let mut world: HittablePool = HittablePool::new();
     world.add(Sphere::new(Point::new(0.0,0.0,-1.0), 0.5));
     world.add(Sphere::new(Point::new(0.0,-100.5,-1.0), 100.0));
 
@@ -40,14 +40,14 @@ fn main() {
         let v = y as f64 / (height - 1) as f64;
 
         let mut ray = Ray::new(origin, lower_left_corner + horizontal*u + vertical * v - origin);
-        let color = ray_color(world.clone(), &mut ray);
+        let color = ray_color(&world, &mut ray);
         // println!("{} {} ",color.x,color.x as u8);
         *pixel = image::Rgb(color_to_pix(color));
     }
     img.save("Image.png").unwrap();
 }
 
-fn  ray_color<T: Hittable>(world: HittablePool<T>, r: &mut Ray) -> Color {
+fn  ray_color(world: &HittablePool, r: &mut Ray) -> Color {
     let mut rec: HitRecord = HitRecord::default();
     
     if world.hit(r,0.0,f64::INFINITY, &mut rec) {

@@ -23,30 +23,33 @@ impl HitRecord {
     }
 }
 
+
 pub trait Hittable {
-    fn hit(self, r: &mut Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool; 
+    fn hit(&self, r: &mut Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool; 
 }
-#[derive(Debug, Clone, PartialEq)]
-pub struct HittablePool<T: Hittable> {
-    pub objects: Vec<T>
+
+pub struct HittablePool{
+    pub objects: Vec<Box<dyn Hittable>>
 }
-impl<T: Hittable> HittablePool<T> {
+
+impl HittablePool {
     pub fn new() -> Self {
-        HittablePool{
+        Self {
             objects: Vec::new()
         }
     }
-    pub fn add(&mut self, object: T) {
-        self.objects.push(object)
+    pub fn add<T: Hittable + 'static>(&mut self, object: T)-> &mut Self {
+        self.objects.push(Box::new(object));
+        self
     }
 }
 
-impl<T: Hittable> Hittable for HittablePool<T>{
-    fn hit(self, r: &mut Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool{
+impl Hittable for HittablePool{
+    fn hit(&self, r: &mut Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool{
         let mut temporary_rec: HitRecord = HitRecord::default();
         let mut hitted = false;
         let mut closest = t_max;
-        for object in self.objects {
+        for object in self.objects.iter() {
             if object.hit(r,t_min, closest, &mut temporary_rec) {
                 hitted = true;
                 closest = temporary_rec.t;
