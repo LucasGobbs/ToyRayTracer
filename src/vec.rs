@@ -1,4 +1,5 @@
 use std::ops::*;
+use rand::Rng;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
@@ -7,6 +8,7 @@ pub struct Vec3 {
 }
 pub type Point = Vec3;
 pub type Color = Vec3;
+
 impl Vec3{
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 {
@@ -56,8 +58,67 @@ impl Vec3{
         self.y /= ln;
         self.z /= ln;
     }
+    pub fn random() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3 {
+            x: rng.gen_range(0.0 .. 1.0),
+            y: rng.gen_range(0.0 .. 1.0),
+            z: rng.gen_range(0.0 .. 1.0),
+        }
+    }
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3 {
+            x: rng.gen_range(min .. max),
+            y: rng.gen_range(min .. max),
+            z: rng.gen_range(min .. max),
+        }
+    }
+    
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random_range(-1.0,1.0);
+            if p.len_sqrt() >= 1.0  {
+                continue;
+            }
+            return p
+        };
+    }
+    pub fn random_unit_vector() -> Vec3 {
+        Vec3::random_in_unit_sphere().normal()
+    }
+    pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+        let in_unit = Vec3::random_in_unit_sphere();
+        return if in_unit.dot(normal) > 0.0 {
+            in_unit
+        } else {
+            -in_unit
+        }
+    }
+    pub fn near_zero(self) -> bool {
+        let s = 1e-8;
+        return (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
+    }
+    pub fn reflect(self, n: Vec3) -> Vec3 {
+        self - n * self.dot(n) * 2.0
+    }
+
+    pub const RED: Vec3 = Vec3{x: 1.0, y: 0.0, z: 0.0};
+    pub const LRED: Vec3 = Vec3{x: 0.8, y: 0.2, z: 0.2};
+
+    pub const GREEN: Vec3 = Vec3{x: 0.0, y: 1.0, z: 0.0};
+    pub const LGREEN: Vec3 = Vec3{x: 0.2, y: 0.8, z: 0.2};
+
+    pub const BLUE: Vec3 = Vec3{x: 0.0, y: 0.0, z: 1.0};
+    pub const LBLUE: Vec3 = Vec3{x: 0.2, y: 0.2, z: 0.8};
+
+    pub const LYELLOW: Vec3 = Vec3{x: 0.8, y: 0.8, z: 0.0};
+    pub const LPURPLE: Vec3 = Vec3{x: 0.8, y: 0.2, z: 0.8};
+
+    pub const GRAY: Vec3 = Vec3{x: 0.5, y: 0.5, z: 0.5};
 }
-// a + b
+
+
 impl Add for Vec3 {
     type Output = Self;
 
